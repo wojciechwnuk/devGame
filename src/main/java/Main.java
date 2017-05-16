@@ -32,6 +32,8 @@ public class Main extends Application {
     private final Background brightBackground = new Background(new BackgroundFill(Color.web("#fff9f4"), CornerRadii.EMPTY, Insets.EMPTY));
 
     private Scene getMainScene() {
+        DevObjects devObjects = new DevObjects();
+
         BorderPane mainBorderPane = new BorderPane();
         //-------------------------------------------------------------------------TOP
         HBox topHbox = new HBox();
@@ -153,24 +155,22 @@ public class Main extends Application {
         centerBorderPane.setTop(hireHBox);
 
         //-------------------------------------------------------------CENTER/BOTTOM
-        HBox helpHbox=new HBox();
+        HBox helpHbox = new HBox();
         Button helpButton = new Button();
         helpButton.setText("HELP IN CODING!");
-        helpButton.setPrefSize(400,100);
+        helpButton.setOnAction(event -> devObjects.addWorkingDev());
+        helpButton.setPrefSize(400, 100);
         buttonFontSettings(helpButton);
         helpHbox.setAlignment(Pos.CENTER);
         helpHbox.getChildren().addAll(helpButton);
         centerBorderPane.setBottom(helpHbox);
 
         //-------------------------------------------------------------CENTER/CENTER
-        StackPane centerStackPane = new StackPane();
-        centerStackPane.setBackground(brightBackground);
+        DevObjects gameObject = new DevObjects();
+        centerBorderPane.setCenter(gameObject.createContent());
 
 
-        centerBorderPane.setCenter(centerStackPane);
-
-
-        mainBorderPane.setCenter(centerBorderPane);
+                mainBorderPane.setCenter(centerBorderPane);
         Scene mainScene = new Scene(mainBorderPane);
         return mainScene;
     }
@@ -179,8 +179,13 @@ public class Main extends Application {
         label.setFont(Font.font("Century Gothic", 20));
         label.setTextFill(Color.WHITE);
     }
-    private void buttonFontSettings (Button button){
+
+    private void buttonFontSettings(Button button) {
         button.setFont(Font.font("Century Gothic", FontWeight.BOLD, 15));
 
     }
+
+
+
+
 }
