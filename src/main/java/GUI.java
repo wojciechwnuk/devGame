@@ -1,4 +1,4 @@
-import javafx.application.Application;
+import database.HibernateDAO;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -10,8 +10,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.Stage;
-
+import java.text.DecimalFormat;
 
 class GUI {
 
@@ -19,17 +18,26 @@ class GUI {
     private final Background greyBackground = new Background(new BackgroundFill(Color.web("#16333d"), CornerRadii.EMPTY, Insets.EMPTY));
     private final Background blueBackground = new Background(new BackgroundFill(Color.web("#006e93"), CornerRadii.EMPTY, Insets.EMPTY));
     private final Background brightBackground = new Background(new BackgroundFill(Color.web("#fff9f4"), CornerRadii.EMPTY, Insets.EMPTY));
+
     static Label linesLabel;
+    static Button helpButton;
+    private double ownedFunds=5000;
+    private CodeProduction codeProduction = new CodeProduction();
+
+    private Label fundsLabel;
+
+
 
     Scene getMainScene() {
-        DevObjects devObjects = new DevObjects();
-        CodeProduction codeProduction = new CodeProduction();
+        HibernateDAO hib = new HibernateDAO();
+
 
         BorderPane mainBorderPane = new BorderPane();
         //-------------------------------------------------------------------------TOP
         HBox topHbox = new HBox();
-        Label fundsLabel = new Label();
-        fundsLabel.setText("Owned funds: ");
+
+        fundsLabel = new Label();
+        fundsLabel.setText("Owned funds: "+ ownedFunds+"$");
         labelFontSettings(fundsLabel);
 
         Label rankLabel = new Label();
@@ -57,9 +65,11 @@ class GUI {
 
         Button saleButton = new Button();
         saleButton.setText("Sale code!");
+
+        saleButton.setOnAction(event->sellCode());
+
         saleButton.setPrefSize(160, 60);
         buttonFontSettings(saleButton);
-
 
         bottomHbox.getChildren().addAll(linesLabel, saleButton);
 
@@ -74,8 +84,12 @@ class GUI {
         vBoxRight.setBackground(brightBackground);
         ListView listView = new ListView();
         listView.setMaxHeight(300);
+
+
+
         listView.setItems(FXCollections.observableArrayList("Developer 1", "Developer 2", "Developer 3", "Developer 4", "Developer 5",
                 "Developer 6", "Developer 7", "Developer 8", "Developer 9", "Developer 10"));
+
 
         Button promoteButton = new Button();
         Button dismissButton = new Button();
@@ -98,16 +112,16 @@ class GUI {
         });
         Button addJunDev = new Button("addJun");
         addJunDev.setOnAction(event -> {
-            DevObjects.permissionToAddDev=1;
+            DevObjects.permissionToAddDev = 1;
         });
 
         Button addRegDev = new Button("addReg");
         addRegDev.setOnAction(event -> {
-            DevObjects.permissionToAddDev=2;
+            DevObjects.permissionToAddDev = 2;
         });
         Button addSenDev = new Button("addSen");
         addSenDev.setOnAction(event -> {
-            DevObjects.permissionToAddDev=3;
+            DevObjects.permissionToAddDev = 3;
         });
         experimentalHbox.getChildren().addAll(startButton, addJunDev, addRegDev, addSenDev);
 
@@ -147,7 +161,9 @@ class GUI {
         Button hireButton = new Button("Hire!");
         buttonFontSettings(hireButton);
         hireButton.setPrefSize(110, 30);
-        Button nextButton = new Button("Next");
+        Button nextButton = new Button();
+        nextButton.setText("Next");
+
         Button prevButton = new Button("Prev");
         buttonFontSettings(nextButton);
         buttonFontSettings(prevButton);
@@ -168,8 +184,9 @@ class GUI {
 
         //-------------------------------------------------------------CENTER/BOTTOM
         HBox helpHbox = new HBox();
-        Button helpButton = new Button();
-        helpButton.setText("HELP IN CODING!");
+        helpButton = new Button();
+        helpButton.setText("HELP IN CODING!" + DevObjects.codePerSec);
+        helpButton.setOnAction(event->CodeProduction.linesOfCodeMeter+=0.5);
         helpButton.setPrefSize(400, 100);
         buttonFontSettings(helpButton);
         helpHbox.setAlignment(Pos.CENTER);
@@ -179,7 +196,6 @@ class GUI {
         //-------------------------------------------------------------CENTER/CENTER
         DevObjects gameObject = new DevObjects();
         centerBorderPane.setCenter(gameObject.createContent());
-
 
         mainBorderPane.setCenter(centerBorderPane);
         Scene mainScene = new Scene(mainBorderPane);
@@ -193,7 +209,12 @@ class GUI {
 
     private void buttonFontSettings(Button button) {
         button.setFont(Font.font("Century Gothic", FontWeight.BOLD, 15));
-
+    }
+    private void sellCode(){
+        DecimalFormat df = new DecimalFormat();
+        df.setMaximumFractionDigits(2);
+        fundsLabel.setText("Owned funds: "+String.valueOf(df.format(ownedFunds+=codeProduction.getLinesOfCodeMeter()*0.5)+"$"));
+        CodeProduction.linesOfCodeMeter=0;
     }
 
 

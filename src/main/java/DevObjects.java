@@ -25,6 +25,7 @@ class DevObjects {
 
     DevObjects() {
     }
+
     private void update() {
         node.setTranslateX(node.getTranslateX() + velocity.getX());
         node.setTranslateY(node.getTranslateY() + velocity.getY());
@@ -70,6 +71,7 @@ class DevObjects {
     private void onUpdate() throws InterruptedException {
 
         devBalls.forEach(DevObjects::update);
+
 
         for (DevObjects devBall : devBalls) {
             if (Math.random() > 0.99) {

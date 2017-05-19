@@ -7,6 +7,10 @@ public class CodeProduction extends TimerTask {
     static double linesOfCodeMeter = 0;
     private DevObjects devObjects;
 
+    public  double getLinesOfCodeMeter() {
+        return linesOfCodeMeter;
+    }
+
     public void run() {
         devObjects = new DevObjects();
         linesOfCodeMeter += DevObjects.codePerSec;
@@ -14,7 +18,7 @@ public class CodeProduction extends TimerTask {
 
     void startCoding() {
         Timer timer = new Timer();
-        timer.schedule(new CodeProduction(), 0, 100);
+        timer.schedule(new CodeProduction(), 0, 1000);
     }
 
     public static void main(String[] args) {
