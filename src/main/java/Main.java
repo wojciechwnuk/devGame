@@ -1,3 +1,4 @@
+import database.HibernateDAO;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -23,4 +24,5 @@ public class Main extends Application {
             System.exit(0);
         });
     }
+
 }

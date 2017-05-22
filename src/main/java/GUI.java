@@ -1,3 +1,4 @@
+import database.Employee;
 import database.HibernateDAO;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
@@ -11,6 +12,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import java.text.DecimalFormat;
+import java.util.List;
 
 class GUI {
 
@@ -21,14 +23,14 @@ class GUI {
 
     static Label linesLabel;
     static Button helpButton;
-    private double ownedFunds=5000;
+    private double ownedFunds = 5000;
+    private int actualOnListCv = 0;
     private CodeProduction codeProduction = new CodeProduction();
-
     private Label fundsLabel;
 
 
-
     Scene getMainScene() {
+        addEntities();
         HibernateDAO hib = new HibernateDAO();
 
 
@@ -37,7 +39,7 @@ class GUI {
         HBox topHbox = new HBox();
 
         fundsLabel = new Label();
-        fundsLabel.setText("Owned funds: "+ ownedFunds+"$");
+        fundsLabel.setText("Owned funds: " + ownedFunds + "$");
         labelFontSettings(fundsLabel);
 
         Label rankLabel = new Label();
@@ -66,7 +68,7 @@ class GUI {
         Button saleButton = new Button();
         saleButton.setText("Sale code!");
 
-        saleButton.setOnAction(event->sellCode());
+        saleButton.setOnAction(event -> sellCode());
 
         saleButton.setPrefSize(160, 60);
         buttonFontSettings(saleButton);
@@ -84,7 +86,6 @@ class GUI {
         vBoxRight.setBackground(brightBackground);
         ListView listView = new ListView();
         listView.setMaxHeight(300);
-
 
 
         listView.setItems(FXCollections.observableArrayList("Developer 1", "Developer 2", "Developer 3", "Developer 4", "Developer 5",
@@ -151,22 +152,34 @@ class GUI {
         nameVbox.setPadding(new Insets(5));
         nameVbox.setBackground(brightBackground);
         Label nameLabel = new Label();
-        nameLabel.setText("First name + surname");
+        nameLabel.setText(getCvName());
+
         nameLabel.setFont(Font.font("Century Gothic", 20));
         Label expLabel = new Label();
         expLabel.setFont(Font.font("Century Gothic", 20));
-        expLabel.setText("Experience + salary");
+        expLabel.setText(getCvExperience()+", "+String.valueOf(getCvSalary())+"$");
         nameVbox.getChildren().addAll(nameLabel, expLabel);
 
         Button hireButton = new Button("Hire!");
+        hireButton.setOnAction(event->hire());
         buttonFontSettings(hireButton);
         hireButton.setPrefSize(110, 30);
         Button nextButton = new Button();
         nextButton.setText("Next");
+        nextButton.setOnAction(event -> {
+            nextCv();
+            expLabel.setText(getCvExperience()+", "+String.valueOf(getCvSalary())+"$");
+            nameLabel.setText(getCvName());
+        });
 
         Button prevButton = new Button("Prev");
         buttonFontSettings(nextButton);
         buttonFontSettings(prevButton);
+        prevButton.setOnAction(event -> {
+            prevCv();
+            expLabel.setText(getCvExperience()+", "+String.valueOf(getCvSalary())+"$");
+            nameLabel.setText(getCvName());
+        });
 
         VBox buttonsHireVbox = new VBox();
         buttonsHireVbox.setSpacing(5);
@@ -186,7 +199,7 @@ class GUI {
         HBox helpHbox = new HBox();
         helpButton = new Button();
         helpButton.setText("HELP IN CODING!" + DevObjects.codePerSec);
-        helpButton.setOnAction(event->CodeProduction.linesOfCodeMeter+=0.5);
+        helpButton.setOnAction(event -> CodeProduction.linesOfCodeMeter += 0.5);
         helpButton.setPrefSize(400, 100);
         buttonFontSettings(helpButton);
         helpHbox.setAlignment(Pos.CENTER);
@@ -210,11 +223,68 @@ class GUI {
     private void buttonFontSettings(Button button) {
         button.setFont(Font.font("Century Gothic", FontWeight.BOLD, 15));
     }
-    private void sellCode(){
+
+    private void sellCode() {
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
-        fundsLabel.setText("Owned funds: "+String.valueOf(df.format(ownedFunds+=codeProduction.getLinesOfCodeMeter()*0.5)+"$"));
-        CodeProduction.linesOfCodeMeter=0;
+        fundsLabel.setText("Owned funds: " + String.valueOf(df.format(ownedFunds += codeProduction.getLinesOfCodeMeter() * 0.5) + "$"));
+        CodeProduction.linesOfCodeMeter = 0;
+    }
+
+    private String getCvName() {
+        HibernateDAO da = new HibernateDAO();
+        da.setUp();
+        List<Employee> list = da.findByHired(0);
+
+        String name;
+        name = list.get(actualOnListCv).getFirstName() + " " + list.get(actualOnListCv).getLastName();
+        da.exit();
+        return name;
+    }
+    private int getCvSalary(){
+        HibernateDAO da = new HibernateDAO();
+        da.setUp();
+        List<Employee> list = da.findByHired(0);
+        int salary;
+        salary=list.get(actualOnListCv).getSalary();
+        da.exit();
+        return salary;
+    }
+    private String getCvExperience(){
+        HibernateDAO da = new HibernateDAO();
+        da.setUp();
+        List<Employee> list = da.findByHired(0);
+        String experience;
+        experience=list.get(actualOnListCv).getPosition();
+        da.exit();
+        return  experience;
+    }
+
+    private void nextCv() {
+        if (actualOnListCv< 3) {
+            actualOnListCv++;}
+    }
+
+    private void prevCv() {
+        if (actualOnListCv>0){
+        actualOnListCv--;}
+    }
+
+    private void addEntities() {
+        HibernateDAO hibernateDAO = new HibernateDAO();
+        hibernateDAO.setUp();
+        hibernateDAO.addHumansIfEmpty();
+        hibernateDAO.exit();
+    }
+    private int hire(){
+        HibernateDAO da = new HibernateDAO();
+        da.setUp();
+        List<Employee> list = da.findByHired(0);
+        int actId;
+        actId=list.get(actualOnListCv).getId();
+        da.hire(actId);
+        da.exit();
+        return actId;
     }
 
 
