@@ -12,7 +12,7 @@ import java.util.List;
 @Data
 class DevObjects {
     private StackPane root;
-    private List<DevObjects> devBalls = new ArrayList<DevObjects>();
+    private List<DevObjects> devBalls = new ArrayList<>();
     private AnimationTimer timer;
     private Node node;
     private Point2D velocity = new Point2D(0, 0);
@@ -97,19 +97,19 @@ class DevObjects {
     private void addRegularDev() {
         RegularDev regular = new RegularDev();
         addDevBall(regular, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());
-        codePerSec += 0.2;
+        codePerSec += 1.5;
     }
 
     private void addJuniorDev() {
         JuniorDev junior = new JuniorDev();
         addDevBall(junior, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());
-        codePerSec += 0.1;
+        codePerSec += 0.5;
     }
 
     private void addSeniorDev() {
         SeniorDev senior = new SeniorDev();
         addDevBall(senior, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());
-        codePerSec += 0.3;
+        codePerSec += 3;
     }
 
     //----------------------------------------------------------------------------------------------------------Devs circles

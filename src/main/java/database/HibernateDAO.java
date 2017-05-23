@@ -1,13 +1,17 @@
 package database;
 
 import lombok.Data;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -56,11 +60,13 @@ public class HibernateDAO {
     }
 
    public void hire(int id){
+        setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Employee employee = session.get(Employee.class, id);
         employee.setHired(true);
         session.getTransaction().commit();
+        exit();
     }
     public void dismiss(int id){
         Session session = sessionFactory.openSession();
@@ -70,7 +76,7 @@ public class HibernateDAO {
         session.getTransaction().commit();
     }
 
-    String findLastNameById(int id) {
+   public String findLastNameById(int id) {
         String nazwisko;
 
         Session session = sessionFactory.openSession();
@@ -93,7 +99,22 @@ public class HibernateDAO {
         return employees;
     }
 
+
+    public Long countHired(boolean hired){
+        setUp();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        Criteria crit = session.createCriteria(Employee.class);
+        crit.add(Restrictions.eq("hired", hired));
+        crit.setProjection(Projections.rowCount());
+        Long count = (Long) crit.uniqueResult();
+        exit();
+        return  count;
+    }
+
     public List<Employee> findByHired(int hired) {
+        setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
 
@@ -105,42 +126,48 @@ public class HibernateDAO {
 
         List<Employee> employees = session.createQuery(criteria).getResultList();
         session.getTransaction().commit();
-
+        exit();
         return employees;
     }
 
-    Long databaseSize() {
+    private Long databaseSize() {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Long count = (Long) session.createQuery("select count(*) as id from Employee").iterate().next();
         session.getTransaction().commit();
-        System.out.println(count);
         return count;
     }
 
     public void addHumansIfEmpty() {
         if (databaseSize() == 0) {
-            create("Adam", "Adamski", true, "Junior", 2500);
+            create("Adam", "Adamski", false, "Junior", 2500);
             create("Beata", "Beczkowska", false, "Junior", 2600);
             create("Celina", "Cycowska", false, "Regular", 3500);
             create("Damian", "Daminski", false, "Regular", 3500);
-            create("Edmund", "Ebu", false, "Senior", 5500);
+            create("Edmund", "Ebuncki", false, "Senior", 5500);
         }
     }
 
+    public void clearTable(){
+        setUp();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+        session.createQuery("delete from Employee").executeUpdate();
+        session.getTransaction().commit();
+        exit();
+    }
 
+    public void updatePosition(){
+        setUp();
+        Session session = sessionFactory.openSession();
+        session.beginTransaction();
+     //   session.createQuery("")
+
+    }
 
 
     public static void main(String[] args) {
         HibernateDAO da = new HibernateDAO();
-        da.setUp();
-        System.out.println(da.databaseSize());
-        da.addHumansIfEmpty();
-
-//        List<Employee> employees = da.findByHired(0);
-//        for (int i = 0; i < employees.size(); i++) {
-//            System.out.println(employees.get(i).getLastName());
-//        }
 
         da.exit();
     }

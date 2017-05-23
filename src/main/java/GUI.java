@@ -1,6 +1,7 @@
 import database.Employee;
 import database.HibernateDAO;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -11,28 +12,38 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.text.DecimalFormat;
 import java.util.List;
 
-class GUI {
 
-    private final Background darkBlueBackground = new Background(new BackgroundFill(Color.web("#003040"), CornerRadii.EMPTY, Insets.EMPTY));
-    private final Background greyBackground = new Background(new BackgroundFill(Color.web("#16333d"), CornerRadii.EMPTY, Insets.EMPTY));
-    private final Background blueBackground = new Background(new BackgroundFill(Color.web("#006e93"), CornerRadii.EMPTY, Insets.EMPTY));
-    private final Background brightBackground = new Background(new BackgroundFill(Color.web("#fff9f4"), CornerRadii.EMPTY, Insets.EMPTY));
+class GUI {
+    private static final Logger logger = LoggerFactory.getLogger(GUI.class);
+
 
     static Label linesLabel;
     static Button helpButton;
+    private Button hireButton;
     private double ownedFunds = 5000;
     private int actualOnListCv = 0;
     private CodeProduction codeProduction = new CodeProduction();
     private Label fundsLabel;
+    private Label nameLabel;
+    private HBox listViewHbox;
 
 
     Scene getMainScene() {
-        addEntities();
-        HibernateDAO hib = new HibernateDAO();
 
+         final Background darkBlueBackground = new Background(new BackgroundFill(Color.web("#003040"), CornerRadii.EMPTY, Insets.EMPTY));
+         final Background greyBackground = new Background(new BackgroundFill(Color.web("#16333d"), CornerRadii.EMPTY, Insets.EMPTY));
+         final Background blueBackground = new Background(new BackgroundFill(Color.web("#006e93"), CornerRadii.EMPTY, Insets.EMPTY));
+         final Background brightBackground = new Background(new BackgroundFill(Color.web("#fff9f4"), CornerRadii.EMPTY, Insets.EMPTY));
+
+        addEntities();
+        startAnimations();
+        HibernateDAO hib = new HibernateDAO();
 
         BorderPane mainBorderPane = new BorderPane();
         //-------------------------------------------------------------------------TOP
@@ -84,17 +95,11 @@ class GUI {
         //--------------------------------------------------------------------------RIGHT
         VBox vBoxRight = new VBox();
         vBoxRight.setBackground(brightBackground);
-        ListView listView = new ListView();
-        listView.setMaxHeight(300);
-
-
-        listView.setItems(FXCollections.observableArrayList("Developer 1", "Developer 2", "Developer 3", "Developer 4", "Developer 5",
-                "Developer 6", "Developer 7", "Developer 8", "Developer 9", "Developer 10"));
-
 
         Button promoteButton = new Button();
         Button dismissButton = new Button();
         promoteButton.setText("Promote!");
+
         dismissButton.setText("Dismiss!");
         buttonFontSettings(dismissButton);
         buttonFontSettings(promoteButton);
@@ -104,29 +109,10 @@ class GUI {
         devHBox.setSpacing(60);
         devHBox.getChildren().addAll(promoteButton, dismissButton);
 
-        HBox experimentalHbox = new HBox();
-        Button startButton = new Button("start");
-        startButton.setOnAction(event -> {
-            codeProduction.startCoding();
-            CodeTimerAnimation codeTimer = new CodeTimerAnimation();
-            codeTimer.update();
-        });
-        Button addJunDev = new Button("addJun");
-        addJunDev.setOnAction(event -> {
-            DevObjects.permissionToAddDev = 1;
-        });
+        listViewHbox = new HBox();
+        listViewHbox.getChildren().add(createListView());
 
-        Button addRegDev = new Button("addReg");
-        addRegDev.setOnAction(event -> {
-            DevObjects.permissionToAddDev = 2;
-        });
-        Button addSenDev = new Button("addSen");
-        addSenDev.setOnAction(event -> {
-            DevObjects.permissionToAddDev = 3;
-        });
-        experimentalHbox.getChildren().addAll(startButton, addJunDev, addRegDev, addSenDev);
-
-        vBoxRight.getChildren().addAll(listView, devHBox, experimentalHbox);
+        vBoxRight.getChildren().addAll(listViewHbox, devHBox);
         vBoxRight.setPadding(new Insets(10));
         mainBorderPane.setRight(vBoxRight);
 
@@ -140,46 +126,100 @@ class GUI {
 
         HBox hireHBox = new HBox();
         Label cvLabel = new Label();
-
         hireHBox.setSpacing(80);
         hireHBox.setPadding(new Insets(10));
         hireHBox.setBackground(greyBackground);
         cvLabel.setText("Received CV's: ");
+
         labelFontSettings(cvLabel);
 
         VBox nameVbox = new VBox();
+        nameVbox.setMinWidth(200);
         nameVbox.setSpacing(5);
         nameVbox.setPadding(new Insets(5));
         nameVbox.setBackground(brightBackground);
-        Label nameLabel = new Label();
+        nameLabel = new Label();
         nameLabel.setText(getCvName());
 
         nameLabel.setFont(Font.font("Century Gothic", 20));
         Label expLabel = new Label();
         expLabel.setFont(Font.font("Century Gothic", 20));
-        expLabel.setText(getCvExperience()+", "+String.valueOf(getCvSalary())+"$");
+        expLabel.setText(getPosition(0) + ", " + String.valueOf(getSalary(0)) + "$");
         nameVbox.getChildren().addAll(nameLabel, expLabel);
 
-        Button hireButton = new Button("Hire!");
-        hireButton.setOnAction(event->hire());
+        hireButton = new Button("Hire!");
         buttonFontSettings(hireButton);
         hireButton.setPrefSize(110, 30);
         Button nextButton = new Button();
         nextButton.setText("Next");
-        nextButton.setOnAction(event -> {
-            nextCv();
-            expLabel.setText(getCvExperience()+", "+String.valueOf(getCvSalary())+"$");
-            nameLabel.setText(getCvName());
-        });
 
         Button prevButton = new Button("Prev");
         buttonFontSettings(nextButton);
         buttonFontSettings(prevButton);
-        prevButton.setOnAction(event -> {
-            prevCv();
-            expLabel.setText(getCvExperience()+", "+String.valueOf(getCvSalary())+"$");
+
+        nextButton.setOnAction(event -> {
+            nextCv();
+            expLabel.setText(getPosition(0) + ", " + String.valueOf(getSalary(0)) + "$");
             nameLabel.setText(getCvName());
         });
+        prevButton.setOnAction(event -> {
+            prevCv();
+            if (nextButton.isDisable()) {
+                nextButton.setDisable(false);
+            }
+            expLabel.setText(getPosition(0) + ", " + String.valueOf(getSalary(0)) + "$");
+            nameLabel.setText(getCvName());
+        });
+        //-------------------------------------------------------------------------------------HIRE action
+        hireButton.setOnAction(event -> {
+            if (!fundsControl()) {
+                return;
+            }
+
+            List<Employee> list = hib.findByHired(0);
+            String actPosition;
+            int actSalaryCosts;
+            actPosition = list.get(actualOnListCv).getPosition();
+            actSalaryCosts = list.get(actualOnListCv).getSalary();
+            switch (actPosition) {
+                case "Junior":
+                    DevObjects.permissionToAddDev = 1;
+                    ownedFunds = ownedFunds - actSalaryCosts;
+                    fundsLabel.setText("Owned funds: " + ownedFunds + "$");
+
+                    break;
+                case "Regular":
+                    DevObjects.permissionToAddDev = 2;
+                    ownedFunds = ownedFunds - actSalaryCosts;
+                    fundsLabel.setText("Owned funds: " + ownedFunds + "$");
+
+                    break;
+                case "Senior":
+                    DevObjects.permissionToAddDev = 3;
+                    ownedFunds = ownedFunds - actSalaryCosts;
+                    fundsLabel.setText("Owned funds: " + ownedFunds + "$");
+                    break;
+            }
+            hire();
+            nameLabel.setText("Hired!");
+            expLabel.setText("-" + actSalaryCosts + "$!");
+
+
+            if (nameLabel.getText().equals("Hired!")) {
+                hireButton.setDisable(true);
+            }
+            if (actualOnListCv == hib.countHired(false)) {
+                nextButton.setDisable(true);
+            }
+
+            if (hib.countHired(false) == 0) {
+                hireButton.setDisable(true);
+                prevButton.setDisable(true);
+                nextButton.setDisable(true);
+            }
+            refreshListView();
+        });
+
 
         VBox buttonsHireVbox = new VBox();
         buttonsHireVbox.setSpacing(5);
@@ -192,6 +232,7 @@ class GUI {
         buttonsHireVbox.getChildren().addAll(hireButton, nextPrevHbox);
 
         hireHBox.setAlignment(Pos.CENTER);
+
         hireHBox.getChildren().addAll(cvLabel, nameVbox, buttonsHireVbox);
         centerBorderPane.setTop(hireHBox);
 
@@ -211,8 +252,7 @@ class GUI {
         centerBorderPane.setCenter(gameObject.createContent());
 
         mainBorderPane.setCenter(centerBorderPane);
-        Scene mainScene = new Scene(mainBorderPane);
-        return mainScene;
+        return new Scene(mainBorderPane);
     }
 
     private void labelFontSettings(Label label) {
@@ -227,7 +267,7 @@ class GUI {
     private void sellCode() {
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
-        fundsLabel.setText("Owned funds: " + String.valueOf(df.format(ownedFunds += codeProduction.getLinesOfCodeMeter() * 0.5) + "$"));
+        fundsLabel.setText("Owned funds: " + String.valueOf(df.format(ownedFunds += codeProduction.getLinesOfCodeMeter() * 1.5) + "$"));
         CodeProduction.linesOfCodeMeter = 0;
     }
 
@@ -241,33 +281,47 @@ class GUI {
         da.exit();
         return name;
     }
-    private int getCvSalary(){
+
+    private int getSalary(int ifHired) {
         HibernateDAO da = new HibernateDAO();
         da.setUp();
-        List<Employee> list = da.findByHired(0);
+        List<Employee> list = da.findByHired(ifHired);
         int salary;
-        salary=list.get(actualOnListCv).getSalary();
+        salary = list.get(actualOnListCv).getSalary();
         da.exit();
         return salary;
     }
-    private String getCvExperience(){
+
+    private String getPosition(int ifHired) {
         HibernateDAO da = new HibernateDAO();
         da.setUp();
-        List<Employee> list = da.findByHired(0);
+        List<Employee> list = da.findByHired(ifHired);
         String experience;
-        experience=list.get(actualOnListCv).getPosition();
+        experience = list.get(actualOnListCv).getPosition();
         da.exit();
-        return  experience;
+        return experience;
     }
 
+
     private void nextCv() {
-        if (actualOnListCv< 3) {
-            actualOnListCv++;}
+        HibernateDAO da = new HibernateDAO();
+
+        if (actualOnListCv < da.countHired(false) - 1) {
+            actualOnListCv++;
+        }
+        if ("Hired!".equals(nameLabel.getText())) {
+            hireButton.setDisable(false);
+        }
     }
 
     private void prevCv() {
-        if (actualOnListCv>0){
-        actualOnListCv--;}
+        if (actualOnListCv > 0) {
+            actualOnListCv--;
+        }
+        if ("Hired!".equals(nameLabel.getText())) {
+            hireButton.setDisable(false);
+        }
+
     }
 
     private void addEntities() {
@@ -276,16 +330,57 @@ class GUI {
         hibernateDAO.addHumansIfEmpty();
         hibernateDAO.exit();
     }
-    private int hire(){
+
+    private int hire() {
         HibernateDAO da = new HibernateDAO();
         da.setUp();
         List<Employee> list = da.findByHired(0);
         int actId;
-        actId=list.get(actualOnListCv).getId();
+        actId = list.get(actualOnListCv).getId();
         da.hire(actId);
+
         da.exit();
         return actId;
     }
 
+    private void startAnimations() {
+        codeProduction.startCoding();
+        CodeTimerAnimation codeTimer = new CodeTimerAnimation();
+        codeTimer.update();
+    }
+
+    private void refreshListView() {
+        listViewHbox.getChildren().clear();
+        listViewHbox.getChildren().addAll(createListView());
+    }
+
+    private ListView createListView() {
+        HibernateDAO hib = new HibernateDAO();
+        ListView listView = new ListView();
+        listView.setMaxHeight(300);
+        ObservableList<String> observableListOfHired = FXCollections.observableArrayList();
+
+        for (int i = 0; i < hib.countHired(true); i++) {
+            hib.setUp();
+            observableListOfHired.add(hib.findByHired(1).get(i).getLastName() + ", " + hib.findByHired(1).get(i).getPosition() + ", " + hib.findByHired(1).get(i).getSalary() + "$");
+            hib.exit();
+        }
+        listView.setItems(observableListOfHired);
+        return listView;
+    }
+
+    private boolean fundsControl() {
+        boolean gotEnough;
+        if (ownedFunds - getSalary(0) < 0) {
+            System.out.println("nie stac cie");
+            gotEnough = false;
+        } else gotEnough = true;
+        return gotEnough;
+    }
+    void promoteDev(){
+        if(getPosition(1).equals("Junior")){
+
+        }
+    }
 
 }

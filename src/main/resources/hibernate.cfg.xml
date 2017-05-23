@@ -12,7 +12,8 @@
         <property name="hibernate.connection.username">player</property>
         <property name="hibernate.connection.password">qwerty</property>
 
-        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.format_sql">false</property>
 
         <!-- add classes to map from here -->
         <mapping class="database.Employee"/>
