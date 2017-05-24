@@ -25,8 +25,12 @@ class GUI {
 
     static Label linesLabel;
     static Button helpButton;
+    static Label rankLabel;
+    static int rank = 10;
+    static Label timeToEndLabel;
+
     private Button hireButton;
-    private double ownedFunds = 10000;
+    private double ownedFunds = 6000;
     private int actualOnListCv = 0;
     private CodeProduction codeProduction = new CodeProduction();
     private Label fundsLabel;
@@ -36,10 +40,10 @@ class GUI {
 
     Scene getMainScene() {
 
-         final Background darkBlueBackground = new Background(new BackgroundFill(Color.web("#003040"), CornerRadii.EMPTY, Insets.EMPTY));
-         final Background greyBackground = new Background(new BackgroundFill(Color.web("#16333d"), CornerRadii.EMPTY, Insets.EMPTY));
-         final Background blueBackground = new Background(new BackgroundFill(Color.web("#006e93"), CornerRadii.EMPTY, Insets.EMPTY));
-         final Background brightBackground = new Background(new BackgroundFill(Color.web("#fff9f4"), CornerRadii.EMPTY, Insets.EMPTY));
+        final Background darkBlueBackground = new Background(new BackgroundFill(Color.web("#003040"), CornerRadii.EMPTY, Insets.EMPTY));
+        final Background greyBackground = new Background(new BackgroundFill(Color.web("#16333d"), CornerRadii.EMPTY, Insets.EMPTY));
+        final Background blueBackground = new Background(new BackgroundFill(Color.web("#006e93"), CornerRadii.EMPTY, Insets.EMPTY));
+        final Background brightBackground = new Background(new BackgroundFill(Color.web("#fff9f4"), CornerRadii.EMPTY, Insets.EMPTY));
 
         addEntities();
         startAnimations();
@@ -52,11 +56,11 @@ class GUI {
         fundsLabel.setText("Owned funds: " + ownedFunds + "$");
         labelFontSettings(fundsLabel);
 
-        Label rankLabel = new Label();
-        rankLabel.setText("Ranking: x-th place");
+        rankLabel = new Label();
+        rankLabel.setText("Ranking: 10th place");
         labelFontSettings(rankLabel);
 
-        Label timeToEndLabel = new Label();
+        timeToEndLabel = new Label();
         timeToEndLabel.setText("Time to end: x days");
         labelFontSettings(timeToEndLabel);
 
@@ -78,7 +82,10 @@ class GUI {
         Button saleButton = new Button();
         saleButton.setText("Sale code!");
 
-        saleButton.setOnAction(event -> sellCode());
+        saleButton.setOnAction(event -> {
+            sellCode();
+            rankChecker();
+        });
 
         saleButton.setPrefSize(160, 60);
         buttonFontSettings(saleButton);
@@ -96,17 +103,13 @@ class GUI {
         vBoxRight.setBackground(brightBackground);
 
         Button promoteButton = new Button();
-        Button dismissButton = new Button();
         promoteButton.setText("Promote!");
-
-        dismissButton.setText("Dismiss!");
-        buttonFontSettings(dismissButton);
         buttonFontSettings(promoteButton);
 
         HBox devHBox = new HBox();
         devHBox.setPadding(new Insets(10));
         devHBox.setSpacing(60);
-        devHBox.getChildren().addAll(promoteButton, dismissButton);
+        devHBox.getChildren().addAll(promoteButton);
 
         listViewHbox = new HBox();
         listViewHbox.getChildren().add(createListView());
@@ -347,13 +350,9 @@ class GUI {
         ListView listView = new ListView();
         listView.setMaxHeight(300);
         ObservableList<String> observableListOfHired = FXCollections.observableArrayList();
-        hib.setUp();
         for (int i = 0; i < hib.countHired(true); i++) {
-
             observableListOfHired.add(hib.findByHired(1).get(i).getLastName() + ", " + hib.findByHired(1).get(i).getPosition() + ", " + hib.findByHired(1).get(i).getSalary() + "$");
-
         }
-        hib.exit();
         listView.setItems(observableListOfHired);
         return listView;
     }
@@ -366,9 +365,34 @@ class GUI {
         } else gotEnough = true;
         return gotEnough;
     }
-    void promoteDev(){
-        if(getPosition(1).equals("Junior")){
 
+    void promoteDev() {
+        if (getPosition(1).equals("Junior")) {
+
+        }
+    }
+
+    void rankChecker(){
+        if (ownedFunds > 0 && ownedFunds < 6001) {
+            rank = 10;
+        } else if (ownedFunds > 6001) {
+            rank = 9;
+        } else if (ownedFunds > 8001) {
+            rank = 8;
+        } else if (ownedFunds > 10001) {
+            rank = 7;
+        } else if (ownedFunds > 12001) {
+            rank = 6;
+        } else if (ownedFunds > 15001) {
+            rank = 5;
+        } else if (ownedFunds > 18001) {
+            rank = 4;
+        } else if (ownedFunds > 20001) {
+            rank = 3;
+        } else if (ownedFunds > 25001) {
+            rank = 2;
+        } else if (ownedFunds > 30001) {
+            rank = 1;
         }
     }
 

@@ -12,7 +12,6 @@ import utility.PersonGenerator;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -48,6 +47,7 @@ public class HibernateDAO {
         session.getTransaction().commit();
 
         session.close();
+        exit();
 
     }
 
@@ -77,15 +77,17 @@ public class HibernateDAO {
         }
         session.getTransaction().commit();
         session.close();
-
+        exit();
     }
 
     public void dismiss(int id) {
+        setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Employee employee = session.get(Employee.class, id);
         employee.setHired(false);
         session.getTransaction().commit();
+        exit();
     }
 
 
@@ -110,7 +112,7 @@ public class HibernateDAO {
         crit.setProjection(Projections.rowCount());
         Long count = (Long) crit.uniqueResult();
         session.close();
-
+        exit();
         return count;
     }
 
@@ -128,7 +130,7 @@ public class HibernateDAO {
         List<Employee> employees = session.createQuery(criteria).getResultList();
         session.getTransaction().commit();
         session.close();
-
+        exit();
         return employees;
     }
 
@@ -139,7 +141,7 @@ public class HibernateDAO {
         Long count = (Long) session.createQuery("select count(*) as id from Employee").iterate().next();
         session.getTransaction().commit();
         session.close();
-
+        exit();
         return count;
     }
 
@@ -153,6 +155,7 @@ public class HibernateDAO {
                 create(gen.firstNameGenerator(), gen.lastNameGenerator(), false, position, gen.salaryGenerator(position));
             }
         }
+
     }
 
     public void clearTable() {
@@ -162,7 +165,7 @@ public class HibernateDAO {
         session.createQuery("delete from Employee").executeUpdate();
         session.getTransaction().commit();
         session.close();
-
+        exit();
     }
 
     public void updatePosition() {

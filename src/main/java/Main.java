@@ -9,7 +9,6 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         HibernateDAO hibernateDAO = new HibernateDAO();
-        hibernateDAO.setUp();
         GUI GUI = new GUI();
         primaryStage.setScene(GUI.getMainScene());
 

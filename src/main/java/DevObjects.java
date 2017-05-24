@@ -18,6 +18,7 @@ class DevObjects {
     private Point2D velocity = new Point2D(0, 0);
     static int permissionToAddDev = 0;
     static double codePerSec = 0;
+    private boolean readyToPromote;
 
     DevObjects(Node node) {
         this.node = node;
@@ -58,6 +59,10 @@ class DevObjects {
         timer.start();
         return root;
     }
+    void promoteDevBall(){
+
+    }
+
 
     private void addDevBall(DevObjects devBall, double x, double y) {
         devBalls.add(devBall);
@@ -74,6 +79,7 @@ class DevObjects {
 
 
         for (DevObjects devBall : devBalls) {
+
             if (Math.random() > 0.99) {
                 devBall.rotateRight();
 
@@ -94,8 +100,9 @@ class DevObjects {
         }
     }
 
+    RegularDev regular;
     private void addRegularDev() {
-        RegularDev regular = new RegularDev();
+        regular = new RegularDev();
         addDevBall(regular, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());
         codePerSec += 5;
     }
