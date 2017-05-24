@@ -4,12 +4,13 @@ import javafx.application.Platform;
 import javafx.stage.Stage;
 
 
+
 public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        GUI GUI = new GUI();
         HibernateDAO hibernateDAO = new HibernateDAO();
-
+        hibernateDAO.setUp();
+        GUI GUI = new GUI();
         primaryStage.setScene(GUI.getMainScene());
 
         primaryStage.setResizable(false);
@@ -24,5 +25,4 @@ public class Main extends Application {
             System.exit(0);
         });
     }
-
 }

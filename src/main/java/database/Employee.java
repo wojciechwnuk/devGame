@@ -1,8 +1,8 @@
 package database;
 
 import lombok.Data;
-
 import javax.persistence.*;
+
 @Data
 @Entity
 @Table(name = "empTable")
@@ -18,7 +18,7 @@ public class Employee {
     private boolean hired;
     private int salary;
 
-    Employee() {
+    public Employee() {
     }
 
     public Employee(int id, String firstName, String lastName, String position, boolean hired, int salary) {

@@ -97,19 +97,19 @@ class DevObjects {
     private void addRegularDev() {
         RegularDev regular = new RegularDev();
         addDevBall(regular, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());
-        codePerSec += 1.5;
+        codePerSec += 5;
     }
 
     private void addJuniorDev() {
         JuniorDev junior = new JuniorDev();
         addDevBall(junior, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());
-        codePerSec += 0.5;
+        codePerSec += 3;
     }
 
     private void addSeniorDev() {
         SeniorDev senior = new SeniorDev();
         addDevBall(senior, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());
-        codePerSec += 3;
+        codePerSec += 9;
     }
 
     //----------------------------------------------------------------------------------------------------------Devs circles

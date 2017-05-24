@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+    <class name="database.Employee" table="emptable">
+        <id name="id" type="java.lang.Long">
+            <column name="id"/>
+            <generator class="native"/>
+        </id>
+
+        <property name="firstName" type="java.lang.String">
+            <column name="firstName" not-null="false"/>
+        </property>
+
+        <property name="lastName" type="java.lang.String">
+            <column name="lastName" not-null="false"/>
+        </property>
+
+        <property name="position" type="java.lang.String">
+            <column name="position" not-null="false"/>
+        </property>
+
+        <property name="salary" type="java.lang.Long">
+            <column name="salary" not-null="false"/>
+        </property>
+        <property name="hired" type="java.lang.Long">
+            <column name="hired" not-null="false"/>
+        </property>
+
+    </class>
+</hibernate-mapping>

@@ -26,7 +26,7 @@ class GUI {
     static Label linesLabel;
     static Button helpButton;
     private Button hireButton;
-    private double ownedFunds = 5000;
+    private double ownedFunds = 10000;
     private int actualOnListCv = 0;
     private CodeProduction codeProduction = new CodeProduction();
     private Label fundsLabel;
@@ -44,7 +44,6 @@ class GUI {
         addEntities();
         startAnimations();
         HibernateDAO hib = new HibernateDAO();
-
         BorderPane mainBorderPane = new BorderPane();
         //-------------------------------------------------------------------------TOP
         HBox topHbox = new HBox();
@@ -240,7 +239,7 @@ class GUI {
         HBox helpHbox = new HBox();
         helpButton = new Button();
         helpButton.setText("HELP IN CODING!" + DevObjects.codePerSec);
-        helpButton.setOnAction(event -> CodeProduction.linesOfCodeMeter += 0.5);
+        helpButton.setOnAction(event -> CodeProduction.linesOfCodeMeter += 10);
         helpButton.setPrefSize(400, 100);
         buttonFontSettings(helpButton);
         helpHbox.setAlignment(Pos.CENTER);
@@ -273,32 +272,26 @@ class GUI {
 
     private String getCvName() {
         HibernateDAO da = new HibernateDAO();
-        da.setUp();
         List<Employee> list = da.findByHired(0);
 
         String name;
         name = list.get(actualOnListCv).getFirstName() + " " + list.get(actualOnListCv).getLastName();
-        da.exit();
         return name;
     }
 
     private int getSalary(int ifHired) {
         HibernateDAO da = new HibernateDAO();
-        da.setUp();
         List<Employee> list = da.findByHired(ifHired);
         int salary;
         salary = list.get(actualOnListCv).getSalary();
-        da.exit();
         return salary;
     }
 
     private String getPosition(int ifHired) {
         HibernateDAO da = new HibernateDAO();
-        da.setUp();
         List<Employee> list = da.findByHired(ifHired);
         String experience;
         experience = list.get(actualOnListCv).getPosition();
-        da.exit();
         return experience;
     }
 
@@ -326,20 +319,15 @@ class GUI {
 
     private void addEntities() {
         HibernateDAO hibernateDAO = new HibernateDAO();
-        hibernateDAO.setUp();
         hibernateDAO.addHumansIfEmpty();
-        hibernateDAO.exit();
     }
 
     private int hire() {
         HibernateDAO da = new HibernateDAO();
-        da.setUp();
         List<Employee> list = da.findByHired(0);
         int actId;
         actId = list.get(actualOnListCv).getId();
         da.hire(actId);
-
-        da.exit();
         return actId;
     }
 
@@ -359,12 +347,13 @@ class GUI {
         ListView listView = new ListView();
         listView.setMaxHeight(300);
         ObservableList<String> observableListOfHired = FXCollections.observableArrayList();
-
+        hib.setUp();
         for (int i = 0; i < hib.countHired(true); i++) {
-            hib.setUp();
+
             observableListOfHired.add(hib.findByHired(1).get(i).getLastName() + ", " + hib.findByHired(1).get(i).getPosition() + ", " + hib.findByHired(1).get(i).getSalary() + "$");
-            hib.exit();
+
         }
+        hib.exit();
         listView.setItems(observableListOfHired);
         return listView;
     }

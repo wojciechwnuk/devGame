@@ -7,12 +7,14 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import utility.PersonGenerator;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Data
 public class HibernateDAO {
@@ -27,6 +29,7 @@ public class HibernateDAO {
     }
 
     public void exit() {
+
         sessionFactory.close();
     }
 
@@ -38,12 +41,13 @@ public class HibernateDAO {
         employee.setHired(hired);
         employee.setPosition(position);
         employee.setSalary(salary);
-
+        setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         session.save(employee);
         session.getTransaction().commit();
-        databaseSize = databaseSize();
+
+        session.close();
 
     }
 
@@ -59,16 +63,24 @@ public class HibernateDAO {
         session.close();
     }
 
-   public void hire(int id){
+    public void hire(int id) {
         setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Employee employee = session.get(Employee.class, id);
         employee.setHired(true);
+
+        PersonGenerator gen = new PersonGenerator();
+        for (int i = 0; i < new Random().nextInt(2) + 1; i++) {
+            String position = gen.positionGenerator();
+            create(gen.firstNameGenerator(), gen.lastNameGenerator(), false, position, gen.salaryGenerator(position));
+        }
         session.getTransaction().commit();
-        exit();
+        session.close();
+
     }
-    public void dismiss(int id){
+
+    public void dismiss(int id) {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Employee employee = session.get(Employee.class, id);
@@ -76,18 +88,6 @@ public class HibernateDAO {
         session.getTransaction().commit();
     }
 
-   public String findLastNameById(int id) {
-        String nazwisko;
-
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        Employee employee = session.get(Employee.class, id);
-        session.getTransaction().commit();
-        nazwisko = employee.getLastName();
-        System.out.println(nazwisko);
-
-        return nazwisko;
-    }
 
     public List<Employee> findAll() {
 
@@ -100,7 +100,7 @@ public class HibernateDAO {
     }
 
 
-    public Long countHired(boolean hired){
+    public Long countHired(boolean hired) {
         setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
@@ -109,8 +109,9 @@ public class HibernateDAO {
         crit.add(Restrictions.eq("hired", hired));
         crit.setProjection(Projections.rowCount());
         Long count = (Long) crit.uniqueResult();
-        exit();
-        return  count;
+        session.close();
+
+        return count;
     }
 
     public List<Employee> findByHired(int hired) {
@@ -126,49 +127,50 @@ public class HibernateDAO {
 
         List<Employee> employees = session.createQuery(criteria).getResultList();
         session.getTransaction().commit();
-        exit();
+        session.close();
+
         return employees;
     }
 
     private Long databaseSize() {
+        setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         Long count = (Long) session.createQuery("select count(*) as id from Employee").iterate().next();
         session.getTransaction().commit();
+        session.close();
+
         return count;
     }
 
     public void addHumansIfEmpty() {
+
+        PersonGenerator gen = new PersonGenerator();
         if (databaseSize() == 0) {
-            create("Adam", "Adamski", false, "Junior", 2500);
-            create("Beata", "Beczkowska", false, "Junior", 2600);
-            create("Celina", "Cycowska", false, "Regular", 3500);
-            create("Damian", "Daminski", false, "Regular", 3500);
-            create("Edmund", "Ebuncki", false, "Senior", 5500);
+
+            for (int i = 0; i <3; i++) {
+                String position = gen.positionGenerator();
+                create(gen.firstNameGenerator(), gen.lastNameGenerator(), false, position, gen.salaryGenerator(position));
+            }
         }
     }
 
-    public void clearTable(){
+    public void clearTable() {
         setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
         session.createQuery("delete from Employee").executeUpdate();
         session.getTransaction().commit();
-        exit();
+        session.close();
+
     }
 
-    public void updatePosition(){
+    public void updatePosition() {
         setUp();
         Session session = sessionFactory.openSession();
         session.beginTransaction();
-     //   session.createQuery("")
+        //   session.createQuery("")
 
     }
 
-
-    public static void main(String[] args) {
-        HibernateDAO da = new HibernateDAO();
-
-        da.exit();
-    }
-}
+  }
