@@ -1,11 +1,19 @@
+package utility;
+
 import javafx.animation.AnimationTimer;
+import mainPackage.CodeProduction;
+import mainPackage.DevObjects;
+import mainPackage.GUI;
 
 import java.text.DecimalFormat;
 
 public class CodeTimerAnimation extends AnimationTimer {
+    @Override
+    public void stop() {
+        super.stop();
+    }
 
-
-    void update() {
+    public void update() {
         new AnimationTimer() {
             @Override
             public void handle(long now) {
@@ -16,6 +24,10 @@ public class CodeTimerAnimation extends AnimationTimer {
                 GUI.linesLabel.setText("Lines of code: " + String.valueOf(df.format(CodeProduction.linesOfCodeMeter)));
                 GUI.helpButton.setText("Click to help coding!\n Code per sec: " + df2.format(DevObjects.codePerSec));
                 GUI.rankLabel.setText("Ranking: " + df.format(GUI.rank) + "th place");
+
+                if (CodeProduction.timeToEndMeter > 0) {
+                    GUI.timeToEndLabel.setText("Time to end: " + df2.format(CodeProduction.timeToEndMeter));
+                }
             }
         }.start();
     }
@@ -24,4 +36,5 @@ public class CodeTimerAnimation extends AnimationTimer {
     public void handle(long now) {
 
     }
+
 }

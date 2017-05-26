@@ -1,3 +1,5 @@
+package mainPackage;
+
 import database.HibernateDAO;
 import javafx.application.Application;
 import javafx.application.Platform;

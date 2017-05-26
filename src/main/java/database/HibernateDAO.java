@@ -27,17 +27,17 @@ public class HibernateDAO {
                 .buildSessionFactory();
     }
 
-    public void exit() {
+    private void exit() {
 
         sessionFactory.close();
     }
 
-    void create(String firstname, String lastname, boolean hired, String position, int salary) {
+    private void create(String firstname, String lastname, String position, int salary) {
 
         Employee employee = new Employee();
         employee.setFirstName(firstname);
         employee.setLastName(lastname);
-        employee.setHired(hired);
+        employee.setHired(false);
         employee.setPosition(position);
         employee.setSalary(salary);
         setUp();
@@ -48,19 +48,6 @@ public class HibernateDAO {
 
         session.close();
         exit();
-
-    }
-
-    void delete(int id) {
-
-        Employee employee = new Employee();
-        employee.setId(id);
-
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        session.delete(employee);
-        session.getTransaction().commit();
-        session.close();
     }
 
     public void hire(int id) {
@@ -73,34 +60,12 @@ public class HibernateDAO {
         PersonGenerator gen = new PersonGenerator();
         for (int i = 0; i < new Random().nextInt(2) + 1; i++) {
             String position = gen.positionGenerator();
-            create(gen.firstNameGenerator(), gen.lastNameGenerator(), false, position, gen.salaryGenerator(position));
+            create(gen.firstNameGenerator(), gen.lastNameGenerator(), position, gen.salaryGenerator(position));
         }
         session.getTransaction().commit();
         session.close();
         exit();
     }
-
-    public void dismiss(int id) {
-        setUp();
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        Employee employee = session.get(Employee.class, id);
-        employee.setHired(false);
-        session.getTransaction().commit();
-        exit();
-    }
-
-
-    public List<Employee> findAll() {
-
-        Session session = sessionFactory.openSession();
-        session.beginTransaction();
-        List<Employee> employees = session.createQuery("FROM Employee", Employee.class).getResultList();
-        session.getTransaction().commit();
-
-        return employees;
-    }
-
 
     public Long countHired(boolean hired) {
         setUp();
@@ -152,10 +117,9 @@ public class HibernateDAO {
 
             for (int i = 0; i <3; i++) {
                 String position = gen.positionGenerator();
-                create(gen.firstNameGenerator(), gen.lastNameGenerator(), false, position, gen.salaryGenerator(position));
+                create(gen.firstNameGenerator(), gen.lastNameGenerator(), position, gen.salaryGenerator(position));
             }
         }
-
     }
 
     public void clearTable() {

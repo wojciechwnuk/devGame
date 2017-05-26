@@ -1,5 +1,8 @@
+package mainPackage;
+
 import database.Employee;
 import database.HibernateDAO;
+import javafx.animation.FadeTransition;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -12,38 +15,43 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.util.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utility.CodeTimerAnimation;
 
 import java.text.DecimalFormat;
 import java.util.List;
 
 
-class GUI {
+public class GUI {
     private static final Logger logger = LoggerFactory.getLogger(GUI.class);
 
-
-    static Label linesLabel;
-    static Button helpButton;
-    static Label rankLabel;
-    static int rank = 10;
-    static Label timeToEndLabel;
+   public static Text infoText = new Text();
+    public static Label linesLabel;
+    public static Button helpButton;
+    public static Label rankLabel;
+    public static int rank = 10;
+    public static Label timeToEndLabel;
 
     private Button hireButton;
-    private double ownedFunds = 6000;
+    public static double ownedFunds = 6000;
     private int actualOnListCv = 0;
     private CodeProduction codeProduction = new CodeProduction();
     private Label fundsLabel;
     private Label nameLabel;
     private HBox listViewHbox;
+    CodeTimerAnimation codeTimer = new CodeTimerAnimation();
 
 
-    Scene getMainScene() {
+    Scene getMainScene() throws InterruptedException {
 
         final Background darkBlueBackground = new Background(new BackgroundFill(Color.web("#003040"), CornerRadii.EMPTY, Insets.EMPTY));
         final Background greyBackground = new Background(new BackgroundFill(Color.web("#16333d"), CornerRadii.EMPTY, Insets.EMPTY));
         final Background blueBackground = new Background(new BackgroundFill(Color.web("#006e93"), CornerRadii.EMPTY, Insets.EMPTY));
         final Background brightBackground = new Background(new BackgroundFill(Color.web("#fff9f4"), CornerRadii.EMPTY, Insets.EMPTY));
+
 
         addEntities();
         startAnimations();
@@ -76,7 +84,6 @@ class GUI {
         //------------------------------------------------------------------------- BOTTOM
         HBox bottomHbox = new HBox();
         linesLabel = new Label();
-
         labelFontSettings(linesLabel);
 
         Button saleButton = new Button();
@@ -251,9 +258,16 @@ class GUI {
 
         //-------------------------------------------------------------CENTER/CENTER
         DevObjects gameObject = new DevObjects();
-        centerBorderPane.setCenter(gameObject.createContent());
+        StackPane textAndAnimationStackPane = new StackPane();
+
+
+        textAndAnimationStackPane.getChildren().addAll(gameObject.createContent(),infoText );
+
+
+        centerBorderPane.setCenter(textAndAnimationStackPane);
 
         mainBorderPane.setCenter(centerBorderPane);
+
         return new Scene(mainBorderPane);
     }
 
@@ -335,9 +349,12 @@ class GUI {
     }
 
     private void startAnimations() {
+        codeProduction.startTimer();
         codeProduction.startCoding();
-        CodeTimerAnimation codeTimer = new CodeTimerAnimation();
         codeTimer.update();
+    }
+    public void stopAnimation (){
+        codeTimer.stop();
     }
 
     private void refreshListView() {
@@ -360,7 +377,6 @@ class GUI {
     private boolean fundsControl() {
         boolean gotEnough;
         if (ownedFunds - getSalary(0) < 0) {
-            System.out.println("nie stac cie");
             gotEnough = false;
         } else gotEnough = true;
         return gotEnough;
@@ -372,7 +388,7 @@ class GUI {
         }
     }
 
-    void rankChecker(){
+    void rankChecker() {
         if (ownedFunds > 0 && ownedFunds < 6001) {
             rank = 10;
         } else if (ownedFunds > 6001) {

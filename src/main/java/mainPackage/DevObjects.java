@@ -1,24 +1,32 @@
+package mainPackage;
+
 import javafx.animation.AnimationTimer;
+import javafx.animation.FadeTransition;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.util.Duration;
 import lombok.Data;
+import utility.CodeTimerAnimation;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
-class DevObjects {
+public class DevObjects {
     private StackPane root;
     private List<DevObjects> devBalls = new ArrayList<>();
     private AnimationTimer timer;
     private Node node;
     private Point2D velocity = new Point2D(0, 0);
     static int permissionToAddDev = 0;
-    static double codePerSec = 0;
+    public static double codePerSec = 0;
     private boolean readyToPromote;
+    CodeTimerAnimation timer2;
 
     DevObjects(Node node) {
         this.node = node;
@@ -59,10 +67,28 @@ class DevObjects {
         timer.start();
         return root;
     }
-    void promoteDevBall(){
 
+
+    private void checkIfWin() {
+        if (GUI.rank ==1 ) {
+            Alert alertAddedAnimal = new Alert(Alert.AlertType.INFORMATION);
+            alertAddedAnimal.setTitle("Gratulacje!");
+            alertAddedAnimal.setHeaderText(null);
+            alertAddedAnimal.setContentText("Zdobyłeś wymaganą kwotę przed końcem czasu!");
+            timer.stop();
+
+            alertAddedAnimal.show();
+        }
     }
-
+    private void checkIfLose() {
+        if (GUI.rank ==10 ) {
+            GUI.infoText.setText("wygrales");
+            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.66), GUI.infoText);
+            fadeTransition.setToValue(1);
+            fadeTransition.setDelay(Duration.seconds(1  ));
+            fadeTransition.play();
+        }
+    }
 
     private void addDevBall(DevObjects devBall, double x, double y) {
         devBalls.add(devBall);
@@ -74,9 +100,7 @@ class DevObjects {
     }
 
     private void onUpdate() throws InterruptedException {
-
         devBalls.forEach(DevObjects::update);
-
 
         for (DevObjects devBall : devBalls) {
 
@@ -98,9 +122,13 @@ class DevObjects {
             addSeniorDev();
             permissionToAddDev = 0;
         }
+        checkIfWin();
+        checkIfLose();
+
     }
 
     RegularDev regular;
+
     private void addRegularDev() {
         regular = new RegularDev();
         addDevBall(regular, Math.random() * root.getPrefWidth(), 0 * root.getPrefHeight());

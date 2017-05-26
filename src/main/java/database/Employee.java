@@ -20,13 +20,4 @@ public class Employee {
 
     public Employee() {
     }
-
-    public Employee(int id, String firstName, String lastName, String position, boolean hired, int salary) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.position = position;
-        this.hired = hired;
-        this.salary = salary;
-    }
 }
