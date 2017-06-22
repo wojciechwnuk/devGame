@@ -1,5 +1,6 @@
-package database;
+package database.dao;
 
+import database.Employee;
 import lombok.Data;
 import org.hibernate.Criteria;
 import org.hibernate.Session;

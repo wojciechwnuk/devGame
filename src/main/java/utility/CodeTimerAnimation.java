@@ -1,9 +1,9 @@
 package utility;
 
 import javafx.animation.AnimationTimer;
-import mainPackage.CodeProduction;
-import mainPackage.DevObjects;
-import mainPackage.GUI;
+import app.CodeProduction;
+import app.DevObjects;
+import app.GUI;
 
 import java.text.DecimalFormat;
 

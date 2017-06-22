@@ -1,6 +1,6 @@
-package mainPackage;
+package app;
 
-import database.HibernateDAO;
+import database.dao.HibernateDAO;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;

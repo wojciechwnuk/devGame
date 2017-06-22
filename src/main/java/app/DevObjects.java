@@ -1,15 +1,12 @@
-package mainPackage;
+package app;
 
 import javafx.animation.AnimationTimer;
-import javafx.animation.FadeTransition;
-import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
-import javafx.scene.control.Alert;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.util.Duration;
+import javafx.scene.text.Font;
 import lombok.Data;
 import utility.CodeTimerAnimation;
 
@@ -70,25 +67,21 @@ public class DevObjects {
 
 
     private void checkIfWin() {
-        if (GUI.rank ==1 ) {
-            Alert alertAddedAnimal = new Alert(Alert.AlertType.INFORMATION);
-            alertAddedAnimal.setTitle("Gratulacje!");
-            alertAddedAnimal.setHeaderText(null);
-            alertAddedAnimal.setContentText("Zdobyłeś wymaganą kwotę przed końcem czasu!");
-            timer.stop();
+        if (GUI.rank == 1) {
 
-            alertAddedAnimal.show();
+            GUI.infoText.setText("Congratulations, you win!");
+            GUI.infoText.setFont(Font.font("Century Gothic", 50));
+            GUI.infoText.setFill(Color.BLACK);
         }
     }
-    private void checkIfLose() {
-        if (GUI.rank ==10 ) {
-            GUI.infoText.setText("wygrales");
-            FadeTransition fadeTransition = new FadeTransition(Duration.seconds(0.66), GUI.infoText);
-            fadeTransition.setToValue(1);
-            fadeTransition.setDelay(Duration.seconds(1  ));
-            fadeTransition.play();
+    private void checkIfLose(){
+        if (CodeProduction.timeToEndMeter == 0){
+            GUI.infoText.setText("You lose!");
+            GUI.infoText.setFont(Font.font("Century Gothic", 50));
+            GUI.infoText.setFill(Color.RED);
         }
     }
+
 
     private void addDevBall(DevObjects devBall, double x, double y) {
         devBalls.add(devBall);

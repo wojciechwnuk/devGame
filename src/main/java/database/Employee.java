@@ -18,6 +18,6 @@ public class Employee {
     private boolean hired;
     private int salary;
 
-    public Employee() {
+   public Employee() {
     }
 }
